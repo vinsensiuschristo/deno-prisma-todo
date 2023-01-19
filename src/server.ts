@@ -1,5 +1,16 @@
 import { Application, Router } from "./deps.ts";
 import type { RouterContext } from "./deps.ts";
+import todoRouter from "./todo.routes.ts";
+import { PrismaClient } from "../generated/client/deno/edge.ts";
+
+const DATABASE_URL = Deno.env.get("DATABASE_URL") as unknown as string;
+export const prisma = new PrismaClient({
+    datasources: {
+        db: {
+            url: "prisma://aws-us-east-1.prisma-data.com/?api_key=0BLnEft20yaoNuhb9izu3hB_hjVOaySHKiUGtm8Z7IrpHkBMLKmvgFPJugnwsxeG",
+        },
+    },
+});
 
 const app = new Application();
 
@@ -20,6 +31,7 @@ router.get<string>("/api/healthchecker", (ctx: RouterContext<string>) => {
     };
 });
 
+app.use(todoRouter.prefix("/api/todos/").routes());
 app.use(router.routes()); // Implement our router
 app.use(router.allowedMethods()); // Allow router HTTP methods
 
